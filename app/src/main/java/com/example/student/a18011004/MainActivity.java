@@ -32,7 +32,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class MainActivity extends AppCompatActivity {
     ListView lv;
-    ArrayAdapter<String> adapter;
+    MyAdapter adapter;
     MyHandler dataHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent it = new Intent(MainActivity.this, DetailActivity.class);
-                it.putExtra("link",dataHandler.links.get(i));
+                it.putExtra("link",dataHandler.newsItems.get(i).link);
                 startActivity(it);
             }
         });
@@ -97,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter = new ArrayAdapter<String>(MainActivity.this,
-                                            android.R.layout.simple_list_item_1, dataHandler.titles);
+                                    adapter = new MyAdapter(MainActivity.this,
+                                            dataHandler.newsItems);
                                     lv.setAdapter(adapter);
                                 }
                             });
