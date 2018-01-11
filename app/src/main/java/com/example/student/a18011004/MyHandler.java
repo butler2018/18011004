@@ -7,6 +7,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Student on 2018/1/10.
@@ -18,6 +20,7 @@ public class MyHandler extends DefaultHandler {
     boolean isLink = false;
     boolean isDescription = false;
     StringBuilder linkSB = new StringBuilder();
+    StringBuilder descSB = new StringBuilder();
     public ArrayList<Mobile01NewsItem> newsItems = new ArrayList<>();
     Mobile01NewsItem item;
 
@@ -39,6 +42,7 @@ public class MyHandler extends DefaultHandler {
                 break;
             case "description":
                 isDescription = true;
+                descSB = new StringBuilder();
                 break;
         }
     }
@@ -53,6 +57,7 @@ public class MyHandler extends DefaultHandler {
                 break;
             case "item":
                 isItem = false;
+                Log.d("NET", "When add item, imgurl:" + item.imgurl);
                 newsItems.add(item);
                 break;
             case "link":
@@ -65,7 +70,28 @@ public class MyHandler extends DefaultHandler {
                 break;
             case "description":
                 isDescription = false;
+                if(isItem)
+                {
+                    String str = descSB.toString();
+                    Log.d("NET","end Element str:" + str);
+                    Pattern pattern = Pattern.compile("https.*jpg");
+                    Matcher m = pattern.matcher(str);
+                    String imgurl = "";
+                    if(m.find())
+                    {
+                        imgurl = m.group(0);
+
+                    }
+                    str = str.replaceAll("<img.*>","");
+                    item.description = str;
+                    item.imgurl = imgurl;
+                    Log.d("NET", "In Handler: Item.desc:" + item.description);
+                    Log.d("NET", "In Handler: Item.imgurl:" + item.imgurl);
+
+                }
+
                 break;
+
         }
     }
 
@@ -84,9 +110,7 @@ public class MyHandler extends DefaultHandler {
         }
         if (isDescription && isItem)
         {
-            String str = new String(ch, start, length);
-            str = str.replaceAll("<img.*/>", "");
-            item.description = str;
+            descSB.append(new String(ch,start,length));
         }
     }
 }
